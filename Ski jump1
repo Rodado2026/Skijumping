@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Ski Jumping Game</title>
+<style>
+body{
+  font-family:Arial;
+  background:#87ceeb;
+  text-align:center;
+}
+canvas{
+  background:white;
+  border:2px solid black;
+}
+button{
+  padding:10px;
+  margin:5px;
+  font-size:16px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>Ski Jumping Game</h1>
+
+<button onclick="setHill('planica')">Planica HS240</button>
+<button onclick="setHill('vikersund')">Vikersund HS240</button>
+
+<p>Press SPACE to jump</p>
+
+<canvas id="game" width="800" height="400"></canvas>
+
+<p id="info"></p>
+
+<script>
+
+let canvas=document.getElementById("game")
+let ctx=canvas.getContext("2d")
+
+let hill="planica"
+let x=50
+let y=250
+let speed=0
+let jumping=false
+let landed=false
+let distance=0
+let wind=(Math.random()*4-2).toFixed(1)
+
+function setHill(h){
+  hill=h
+  reset()
+}
+
+function reset(){
+  x=50
+  y=250
+  speed=0
+  jumping=false
+  landed=false
+  distance=0
+  wind=(Math.random()*4-2).toFixed(1)
+}
+
+document.addEventListener("keydown",e=>{
+  if(e.code==="Space" && !jumping){
+    jumping=true
+    speed=8
+  }
+})
+
+function drawHill(){
+  ctx.beginPath()
+  ctx.moveTo(0,300)
+  ctx.lineTo(400,250)
+  ctx.lineTo(800,300)
+  ctx.stroke()
+  
+  ctx.fillText("K200",400,240)
+  ctx.fillText("HS240",550,260)
+}
+
+function drawJumper(){
+  ctx.beginPath()
+  ctx.arc(x,y,5,0,Math.PI*2)
+  ctx.fill()
+}
+
+function physics(){
+  if(!jumping && !landed){
+    x+=2
+  }
+
+  if(jumping && !landed){
+    speed+=-0.2
+    y-=speed
+    x+=3+wind*0.3
+
+    distance=Math.floor((x-200)/2)
+
+    if(y>=260){
+      landed=true
+      y=260
+    }
+  }
+}
+
+function drawInfo(){
+  document.getElementById("info").innerHTML=
+  "Hill: "+hill+
+  " | Wind: "+wind+" m/s"+
+  " | Distance: "+(distance>0?distance:0)+" m"
+}
+
+function game(){
+  ctx.clearRect(0,0,800,400)
+  drawHill()
+  drawJumper()
+  physics()
+  drawInfo()
+  requestAnimationFrame(game)
+}
+
+game()
+
+</script>
+
+</body>
+</html>
